@@ -4,6 +4,7 @@
  */
 package com.barracuda.contest2014;
 
+import behavior.Bot;
 import java.io.IOException;
 
 public class ContestBot {
@@ -12,6 +13,7 @@ public class ContestBot {
 	private final String host;
 	private final int port;
 	private int game_id = -1;
+	private int myPlayerId = -1;
 
 	public ContestBot(String host, int port) {
 		this.host = host;
@@ -64,17 +66,18 @@ public class ContestBot {
 			//System.out.println(m);
 
 			if (game_id != m.game_id) {
+				myPlayerId = m.state.player;
 				game_id = m.game_id;
-				System.out.println("new game " + game_id);
+				System.out.println("New game: " + game_id);
 			}
-
-			if (Math.random() < 0.5) {
+			return Bot.play(m);
+			/* if (Math.random() < 0.5) {
 				return new PlayerWaitMessage(m.id);
 			}
 			else {
 				int i = (int)(Math.random() * m.state.legal_moves.length);
 				return new PlayerMoveMessage(m.id, m.state.legal_moves[i]);
-			}
+			} */
 		}
 		else if (message.type.equals("move_result")) {
 			//ResultMessage r = (ResultMessage)message;
@@ -82,8 +85,8 @@ public class ContestBot {
 			return null;
 		}
 		else if (message.type.equals("game_over")) {
-			//GameOverMessage g = (GameOverMessage)message;
-			//System.out.println(g);
+			GameOverMessage g = (GameOverMessage)message;
+			System.out.println(g.state.winner == myPlayerId ? "WON GAME" : "LOST GAME");
 			return null;
 		}
 		else if (message.type.equals("greetings_program")) {
