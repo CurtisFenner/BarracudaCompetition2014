@@ -33,17 +33,48 @@ public class Board {
 			return false;
 		}
 		Tetra t = new TetraDown(p);
-		boolean conflict = false;
 		for (int x = 0; x < board.length; x++) {
 			for (int y = 0; y < board[0].length; y++) {
 				for (int layer = 0; layer <= p.layer; layer++) {
 					Point k = new Point(x, y, layer);
-					if (t.contains(k)) {
-						conflict = conflict || opponentOf(team) == get(k);
+					if (t.contains(k) && opponentOf(team) == get(k)) {
+						return false;
 					}
 				}
 			}
 		}
-		return !conflict;
+		return true;
+	}
+
+	// Safe means that you're guaranteed this space at the end of the game
+	public boolean safe(Point p, int team) {
+		if (!canPlay(p, team)) {
+			return false;
+		}
+		Tetra t = new TetraDown(p);
+		for (int x = 0; x < board.length; x++) {
+			for (int y = 0; y < board[0].length; y++) {
+				Point k = new Point(x, y, 0);
+				if (t.contains(k) && get(k) != team) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public int boardScore(int team) {
+		int score = 0;
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10 - x; y++) {
+				for (int layer = 0; layer < 10 - y - x; layer++) {
+					Point k = new Point(x,y,layer);
+					if (safe(k, team) || get(k) == team || !canPlay(k,opponentOf(team))) {
+						score++;
+					}
+				}
+			}
+		}
+		return score;
 	}
 }

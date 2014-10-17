@@ -16,4 +16,5 @@ public abstract class Tetra {
 	public Tetra(Point vertex) {
 		this.vertex = vertex;
 	}
+	public static final Tetra boardTetra = new TetraDown(new Point(0, 0, 10));
 }
