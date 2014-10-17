@@ -14,21 +14,26 @@ import com.barracuda.contest2014.PlayerWaitMessage;
  * @author Blu
  */
 public class Bot {
+	
+	public double waitCost(Board b) {
+		return 0;
+	}
 
 	public static PlayerMessage play(MoveRequestMessage input) {
-		if (input.state.opponent_id == 33 || input.state.opponent_id == 18)
-			System.out.println("his:" + input.state.opponent_tokens + "\tmy:" + input.state.tokens);
 		// always at least one legal move in array
 		// choose best
 		// always going to choose bottom row for now
 		int bestChoice = 0;
-		int bestScore = 0;
-		int team = input.state.player;;
+		double bestScore = 0;
+		int team = input.state.player;
 		Board currentBoard = new Board(input.state.board);
+		double baseScore = currentBoard.boardScore(team);
 		for (int i = 0; i < input.state.legal_moves.length; i++) {
 			Point at = new Point(input.state.legal_moves[i]);
 			currentBoard.set(at, team);
-			int value = currentBoard.boardScore(team);
+			int tokenCost = at.layer;
+			double efficiency = (input.state.tokens + 1 - tokenCost) / (double) (input.state.tokens + 1);
+			double value = (currentBoard.boardScore(team) - baseScore) * efficiency;
 			if (value > bestScore) {
 				bestChoice = i;
 				bestScore = value;
