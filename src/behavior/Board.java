@@ -69,7 +69,8 @@ public class Board {
 			for (int y = 0; y < 10 - x; y++) {
 				for (int layer = 0; layer < 10 - y - x; layer++) {
 					Point k = new Point(x,y,layer);
-					if (safe(k, team) || get(k) == team || !canPlay(k,opponentOf(team))) {
+					boolean theyCantWeCan = !canPlay(k,opponentOf(team)) && canPlay(k,team);
+					if (safe(k, team) || get(k) == team || theyCantWeCan) {
 						score++;
 					}
 				}

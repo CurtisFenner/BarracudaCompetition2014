@@ -16,6 +16,8 @@ import com.barracuda.contest2014.PlayerWaitMessage;
 public class Bot {
 
 	public static PlayerMessage play(MoveRequestMessage input) {
+		if (input.state.opponent_id == 33 || input.state.opponent_id == 18)
+			System.out.println("his:" + input.state.opponent_tokens + "\tmy:" + input.state.tokens);
 		// always at least one legal move in array
 		// choose best
 		// always going to choose bottom row for now
@@ -36,19 +38,10 @@ public class Bot {
 		int[] choice = input.state.legal_moves[bestChoice];
 
 
-		if (Math.random() < 0.1) {
+		if (Math.random() < 0.2) {
 			return new PlayerWaitMessage(input.id);
 		} else {
 			return new PlayerMoveMessage(input.id, choice);
 		}
-
-		/*
-		if (Math.random() < 0.5) {
-			return new PlayerWaitMessage(input.id);
-		} else {
-			int i = (int) (Math.random() * input.state.legal_moves.length);
-			return new PlayerMoveMessage(input.id, input.state.legal_moves[i]);
-		}
-		*/
 	}
 }

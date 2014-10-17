@@ -14,6 +14,9 @@ public class ContestBot {
 	private final int port;
 	private int game_id = -1;
 	private int myPlayerId = -1;
+	
+	private int wins = 0;
+	private int losses = 0;
 
 	public ContestBot(String host, int port) {
 		this.host = host;
@@ -86,7 +89,15 @@ public class ContestBot {
 		}
 		else if (message.type.equals("game_over")) {
 			GameOverMessage g = (GameOverMessage)message;
-			System.out.println(g.state.winner == myPlayerId ? "WON GAME" : "LOST GAME");
+			boolean won = g.state.winner == myPlayerId;
+			if (won) {
+				wins++;
+			} else {
+				losses++;
+			}
+			System.out.println(won ? "WON GAME" : "LOST GAME");
+			System.out.println("Won " + (int)((100.0 * wins) / (wins+losses) +0.5) + "%" );
+			System.out.println("\t" + wins + " wins\t" + losses + " losses");
 			return null;
 		}
 		else if (message.type.equals("greetings_program")) {
