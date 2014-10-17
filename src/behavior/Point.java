@@ -17,4 +17,8 @@ public class Point {
 		this.y = y;
 		this.layer = layer;
 	}
+	
+	public int[] toArray() {
+		return new int[] {x,y,layer};
+	}
 }
