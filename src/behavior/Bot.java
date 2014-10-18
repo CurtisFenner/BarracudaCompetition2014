@@ -74,6 +74,11 @@ public class Bot {
 	public static final double FAILURE_REDUCTION = 0.85;
 
 	public static PlayerMessage play(MoveRequestMessage input, int moveCount) {
+		if (ContestBot.myPlayerId == 1) {
+			System.out.println("Scores: " + input.state.score.player1 + "\t" + input.state.score.player2);
+		} else {
+			System.out.println("Scores: " + input.state.score.player2 + "\t" + input.state.score.player1);
+		}
 		System.out.println(input.state.tokens + "\t" + input.state.opponent_tokens);
 		int team = input.state.player;
 		Board board = new Board(input.state.board);
@@ -81,6 +86,18 @@ public class Bot {
 		int tokens = input.state.tokens;
 		int opponentTokens = input.state.opponent_tokens;
 
+		int opponentScore = 0;
+		int myScore = 0;
+		if (input.state.player == 1) {
+			opponentScore = input.state.score.player2;
+			myScore = input.state.score.player1;
+		} else {
+			opponentScore = input.state.score.player1;
+			myScore = input.state.score.player2;
+		}
+		if (opponentScore <= 2) {
+			ContestBot.thisWait++;
+		}
 
 		if (tokens == 1 && Math.random() < 0.5) {
 			Playability play = new Playability(board, team);
@@ -107,10 +124,22 @@ public class Bot {
 		double baseScore = board.boardScore(team);
 		double bestDifference = 0;
 		//
-		int layerLimit = 4;
+
+		int layerLimit = 6;
+
+
+		if (ContestBot.FLIP == 1 && myScore <= 2 && opponentScore <= 2) {
+			System.out.println(moveCount + " >? " + ContestBot.lastWait + " / " + tokens);
+			if (moveCount > ContestBot.lastWait || moveCount > 5) {
+				layerLimit = tokens;
+			} else {
+				return new PlayerWaitMessage(input.id);
+			}
+		}
+
 		//
 		Playability playability = new Playability(board, team);
-		for (int layer = 0; layer < 4 && layer < layerLimit; layer++) {
+		for (int layer = 0; layer < layerLimit; layer++) {
 			int passCount = layer - tokens + 1;
 			if (passCount >= 1) {
 				//boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);

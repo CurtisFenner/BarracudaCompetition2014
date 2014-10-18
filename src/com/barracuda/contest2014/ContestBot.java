@@ -15,7 +15,11 @@ public class ContestBot {
 	private final String host;
 	private final int port;
 	private int game_id = -1;
-	private int myPlayerId = -1;
+	public static int myPlayerId = -1;
+	
+	public static int lastWait = 4;
+	public static int thisWait = 4;
+	
 	public static int FLIP = 0;
 	private int[] wins = new int[2];
 	private int[] losses = new int[2];
@@ -69,6 +73,8 @@ public class ContestBot {
 			MoveRequestMessage m = (MoveRequestMessage) message;
 			game_end_time = m.state.time_remaining_ns;
 			if (game_id != m.game_id) {
+				lastWait = thisWait;
+				thisWait = 0;
 				myPlayerId = m.state.player;
 				game_id = m.game_id;
 				System.out.println("New game: " + game_id);
@@ -97,7 +103,7 @@ public class ContestBot {
 
 			PrintBoard.print(g.state.board, myPlayerId);
 
-
+			
 			//
 			for (FLIP = 0; FLIP < 2; FLIP++) {
 				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
