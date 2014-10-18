@@ -184,7 +184,7 @@ public class Board {
 					double factor = 1;
 					if (layer == 0) {
 						if (x == 0 || y == 0 || x + y == 9) {
-							factor = 0.5;
+							factor = 0.5 * ContestBot.FLIP;
 						}
 					}
 					total += Math.pow(s[x][y][layer] * factor / ((layer + 1) * (layer + 2) / 2.0), 3);

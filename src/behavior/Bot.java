@@ -108,7 +108,7 @@ public class Bot {
 		double bestDifference = 0;
 		//
 
-		int layerLimit = 5;
+		int layerLimit = 4;
 
 		//
 
