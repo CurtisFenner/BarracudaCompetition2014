@@ -34,12 +34,11 @@ public class Board {
 		if (get(p) != 0) {
 			return false;
 		}
-		Tetra t = new TetraDown(p);
-		for (int x = 0; x < board.length; x++) {
-			for (int y = 0; y < board[0].length; y++) {
-				for (int layer = 0; layer <= p.layer; layer++) {
-					Point k = new Point(x, y, layer);
-					if (t.contains(k) && opponentOf(team) == get(k)) {
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10 - x; y++) {
+				for (int layer = 0; layer <= p.layer && layer < 10 - x - y; layer++) {
+					Point at = new Point(x, y, layer);
+					if (TetraDown.contains(p, at) && opponentOf(team) == get(at)) {
 						return false;
 					}
 				}
@@ -48,10 +47,10 @@ public class Board {
 		return true;
 	}
 
-	public double safeness(Point p, int team) {
+	public double safeness(Point p, int team, Playability playability) {
 		double mine = 0;
 		double not = 0;
-		if (!canPlay(p, team)) {
+		if (!playability.get(p)) {
 			return 0;
 		}
 		Tetra t = new TetraDown(p);
@@ -67,15 +66,16 @@ public class Board {
 				}
 			}
 		}
-		return Math.pow(mine / (mine + not), 2);
+		return Math.pow(mine / (mine + not), 3);
 	}
 
 	public double safeness(int team) {
+		Playability playability = new Playability(this, team);
 		double total = 0;
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10 - x; y++) {
 				for (int layer = 0; layer < 10 - x - y; layer++) {
-					total += safeness(new Point(x, y, layer), team);
+					total += safeness(new Point(x, y, layer), team, playability);
 				}
 			}
 		}
@@ -103,7 +103,7 @@ public class Board {
 		return boardValue(team);
 	}
 
-	public double boardScoreSub(int team) {
+	private double boardScoreSub(int team) {
 		int score = 0;
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10 - x; y++) {
@@ -120,9 +120,10 @@ public class Board {
 		return score;
 	}
 
-	public double boardValue(int team) {
+	private double boardValue(int team) {
 		int opponent = opponentOf(team);
 		final double A = 0.5;
+		final double S = 1.5;
 		double score = 0;
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10 - x; y++) {
@@ -156,6 +157,6 @@ public class Board {
 				}
 			}
 		}
-		return score + safeness(team) - safeness(opponent);
+		return score + (safeness(team) - safeness(opponent)) * S;
 	}
 }

@@ -16,8 +16,43 @@ import com.barracuda.contest2014.PlayerWaitMessage;
  */
 public class Bot {
 
+	public static class Move {
 
-	public static Point playBest(Board board, int team, int tokens, int enemyTokens) {
+		public final Point move;
+		public final double score;
+
+		public Move(Point move, double score) {
+			this.move = move;
+			this.score = score;
+		}
+	}
+
+	public static Move minimax(Board b, int team, int tokens, int enemyTokens, int depth) {
+		if (tokens <= 0) {
+			Move enemy = minimax(b, b.opponentOf(team), enemyTokens, tokens + 1, depth);
+			return new Move(null, -enemy.score);
+		}
+		Move bestPlay = playBest(b, team, tokens, enemyTokens);
+		if (bestPlay.move == null) {
+			Move enemy = minimax(b, b.opponentOf(team), enemyTokens, tokens + 1, depth);
+			return new Move(null, -enemy.score);
+		}
+		// Below, Move is not forced.
+		if (depth <= 1) {
+			return bestPlay;
+		}
+		Move waiting = minimax(b, b.opponentOf(team), enemyTokens, tokens + 1, depth - 1 );
+		if (-waiting.score > bestPlay.score) {
+			return new Move(null,-waiting.score);
+		}
+		return bestPlay;
+	}
+
+	public static Move minimax(Board b, int team, int tokens, int enemyTokens) {
+		return minimax(b, team, tokens, enemyTokens, 5);
+	}
+
+	public static Move playBest(Board board, int team, int tokens, int enemyTokens) {
 		double baseScore = board.boardScore(team);
 		double bestScore = 0;
 		Point bestChoice = null;
@@ -39,7 +74,7 @@ public class Bot {
 				}
 			}
 		}
-		return bestChoice;
+		return new Move(bestChoice, bestScore);
 	}
 
 	public static PlayerMessage play(MoveRequestMessage input) {
@@ -49,9 +84,9 @@ public class Bot {
 		int team = input.state.player;
 		Board currentBoard = new Board(input.state.board);
 
-		Point choicePoint = playBest(currentBoard, team, input.state.tokens, input.state.opponent_tokens);
+		Point choicePoint = minimax(currentBoard, team, input.state.tokens, input.state.opponent_tokens).move;
 
-		if (Math.random() < 0.2 || choicePoint == null) {
+		if (Math.random() < 0.05 || choicePoint == null) {
 			return new PlayerWaitMessage(input.id);
 		} else {
 			return new PlayerMoveMessage(input.id, choicePoint.toArray());

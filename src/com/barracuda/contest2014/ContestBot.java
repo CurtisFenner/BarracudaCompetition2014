@@ -91,11 +91,14 @@ public class ContestBot {
 			} else {
 				losses[FLIP]++;
 			}
-			//System.out.println(won ? "WON GAME" : "LOST GAME");
-			System.out.println(FLIP + "\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
-					+ "\t" + wins[FLIP] + " w \t" + losses[FLIP] + " l");
-			System.out.println(game_end_time / 1000 + "ms remaining at end of game");
-			FLIP = 0;//(int)(Math.random() * 2);
+			//
+			for (FLIP = 0; FLIP < wins.length; FLIP++) {
+				System.out.println(FLIP + "\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
+						+ "\t" + wins[FLIP] + " w \t" + losses[FLIP] + " l");
+				System.out.println(game_end_time / 1000 + "ms remaining at end of game");
+			}
+			//
+			FLIP = (int) (Math.random() * 2);
 			return null;
 		} else if (message.type.equals("greetings_program")) {
 			System.out.println("connected to server");
