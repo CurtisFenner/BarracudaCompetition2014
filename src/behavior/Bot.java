@@ -4,6 +4,7 @@
  */
 package behavior;
 
+import com.barracuda.contest2014.ContestBot;
 import com.barracuda.contest2014.MoveRequestMessage;
 import com.barracuda.contest2014.PlayerMessage;
 import com.barracuda.contest2014.PlayerMoveMessage;
@@ -14,39 +15,46 @@ import com.barracuda.contest2014.PlayerWaitMessage;
  * @author Blu
  */
 public class Bot {
-	
-	public double waitCost(Board b) {
-		return 0;
+
+
+	public static Point playBest(Board board, int team, int tokens, int enemyTokens) {
+		double baseScore = board.boardScore(team);
+		double bestScore = 0;
+		Point bestChoice = null;
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10 - x; y++) {
+				for (int layer = 0; layer < 10 - x - y && layer < tokens; layer++) {
+					Point at = new Point(x, y, layer);
+					if (board.canPlay(at, team)) {
+						board.set(at, team);
+						int tokenCost = at.layer;
+						double efficiency = (tokens + 1 - tokenCost) / (double) (tokens + 1);
+						double value = (board.boardScore(team) - baseScore) * efficiency;
+						if (value > bestScore) {
+							bestChoice = at;
+							bestScore = value;
+						}
+						board.set(at, 0);
+					}
+				}
+			}
+		}
+		return bestChoice;
 	}
 
 	public static PlayerMessage play(MoveRequestMessage input) {
 		// always at least one legal move in array
 		// choose best
 		// always going to choose bottom row for now
-		int bestChoice = 0;
-		double bestScore = 0;
 		int team = input.state.player;
 		Board currentBoard = new Board(input.state.board);
-		double baseScore = currentBoard.boardScore(team);
-		for (int i = 0; i < input.state.legal_moves.length; i++) {
-			Point at = new Point(input.state.legal_moves[i]);
-			currentBoard.set(at, team);
-			int tokenCost = at.layer;
-			double efficiency = (input.state.tokens + 1 - tokenCost) / (double) (input.state.tokens + 1);
-			double value = (currentBoard.boardScore(team) - baseScore) * efficiency;
-			if (value > bestScore) {
-				bestChoice = i;
-				bestScore = value;
-			}
-		}
 
-		int[] choice = input.state.legal_moves[bestChoice];
+		Point choicePoint = playBest(currentBoard, team, input.state.tokens, input.state.opponent_tokens);
 
-
-		if (Math.random() < 0.2) {
+		if (Math.random() < 0.2 || choicePoint == null) {
 			return new PlayerWaitMessage(input.id);
 		} else {
-			return new PlayerMoveMessage(input.id, choice);
+			return new PlayerMoveMessage(input.id, choicePoint.toArray());
 		}
 	}
 }
