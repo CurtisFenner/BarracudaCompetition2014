@@ -49,6 +49,7 @@ public class Bot {
 			tokens_flag = tokens;
 			return board;
 		}
+
 		if (bestMove.layer < tokens) {
 			// purchase it
 			tokens -= bestMove.layer + 1;
@@ -79,18 +80,33 @@ public class Bot {
 		int opponentTeam = board.opponentOf(team);
 		int tokens = input.state.tokens;
 		int opponentTokens = input.state.opponent_tokens;
-		//
-		Point bestMove = null;
-		double baseScore = board.boardScore(team);
-		double bestDifference = 0;
-		//
+
+
+		if (tokens == 1 && Math.random() < 0.5) {
+			Playability play = new Playability(board, team);
+			boolean canPlayHigher = false;
+			for (int x = 0; x < 10 - 1; x++) {
+				for (int y = 0; y < 10 - x - 1; y++) {
+					if (play.get(new Point(x, y, 1))) {
+						canPlayHigher = true;
+					}
+				}
+			}
+			if (canPlayHigher) {
+				return new PlayerWaitMessage(input.id);
+			}
+		}
 
 		if (moveCount <= 2) {
 			return new PlayerWaitMessage(input.id);
 		}
 		//Board boardWait = board.copy();
 		//Playability[] waitPlayabilities = new Playability[10];
-
+		//
+		Point bestMove = null;
+		double baseScore = board.boardScore(team);
+		double bestDifference = 0;
+		//
 		Playability playability = new Playability(board, team);
 		for (int layer = 0; layer < 4; layer++) {
 			int passCount = layer - tokens + 1;
@@ -106,8 +122,7 @@ public class Bot {
 					if (playability.get(at) && board.get(at) == 0) {
 						Board b = board.copy();
 						b.playAt(at, team);
-						Board nextBoard = b.copy();
-						double score = nextBoard.boardScore(team);
+						double score = b.boardScore(team);
 						double difference = score - baseScore;
 
 						double efficiency = 1.0 / (2.0 + layer);
