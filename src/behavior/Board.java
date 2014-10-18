@@ -92,12 +92,12 @@ public class Board {
 					}
 					if (opPlay.get(at)) {
 						// We both can play
-						score += 1.0 / (caps[x][y][layer] + 1.0);
+						score += 0.5 / (caps[x][y][layer] + 0.5);
 						continue;
 					}
 					//
 					// Only I can play
-					score += 1.0 / (caps[x][y][layer] + 1.0);
+					score += 1.0 / (caps[x][y][layer] + 0.5);
 				}
 			}
 		}
@@ -250,10 +250,7 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-		if (ContestBot.FLIP == 0) {
-			return safeness(team) - safeness(opponentOf(team)) * 1.5;
-		} else {
-			return value(team) - value(opponentOf(team)) * 1.5;
-		}
+			return safeness(team) - safeness(opponentOf(team)) * 3;
+			// A few percent better than "* 1.5"
 	}
 }

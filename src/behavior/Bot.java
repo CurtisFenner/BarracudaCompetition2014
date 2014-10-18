@@ -107,8 +107,10 @@ public class Bot {
 		double baseScore = board.boardScore(team);
 		double bestDifference = 0;
 		//
+		int layerLimit = 4;
+		//
 		Playability playability = new Playability(board, team);
-		for (int layer = 0; layer < 4; layer++) {
+		for (int layer = 0; layer < 4 && layer < layerLimit; layer++) {
 			int passCount = layer - tokens + 1;
 			if (passCount >= 1) {
 				//boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);
