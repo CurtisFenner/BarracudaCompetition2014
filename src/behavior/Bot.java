@@ -93,9 +93,6 @@ public class Bot {
 			ContestBot.thisWait++;
 		}
 
-		if (board.get(new Point(3, 3, 0)) == 0) {
-			return new PlayerMoveMessage(input.id, new int[]{3, 3, 0});
-		}
 
 		if (tokens == 1 && Math.random() < 0.5) {
 			Playability play = new Playability(board, team);
@@ -127,7 +124,6 @@ public class Bot {
 
 
 		if (myScore <= 2 && opponentScore <= 2) {
-			System.out.println(moveCount + " >? " + ContestBot.lastWait + " / " + tokens);
 			if (moveCount > ContestBot.lastWait || moveCount > 5) {
 				layerLimit = tokens;
 			} else {
@@ -200,7 +196,6 @@ public class Bot {
 				bestMoveValue = value;
 				bestMoveIndex = i;
 			}
-
 		}
 
 		Point bestMove;

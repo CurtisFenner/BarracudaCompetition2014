@@ -16,10 +16,8 @@ public class ContestBot {
 	private final int port;
 	private int game_id = -1;
 	public static int myPlayerId = -1;
-	
 	public static int lastWait = 4;
 	public static int thisWait = 4;
-	
 	public static int FLIP = 0;
 	private int[] wins = new int[2];
 	private int[] losses = new int[2];
@@ -101,9 +99,8 @@ public class ContestBot {
 			}
 			System.out.println("FLIP: " + FLIP);
 
-			PrintBoard.print(g.state.board, myPlayerId);
+			// PrintBoard.print(g.state.board, myPlayerId);
 
-			
 			//
 			for (FLIP = 0; FLIP < 2; FLIP++) {
 				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
