@@ -93,6 +93,7 @@ public class ContestBot {
 				losses[FLIP]++;
 				System.out.println("LOST!");
 			}
+			System.out.println("FLIP: " + FLIP);
 
 			PrintBoard.print(g.state.board, myPlayerId);
 

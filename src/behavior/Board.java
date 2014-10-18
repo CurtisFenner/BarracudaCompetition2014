@@ -4,6 +4,8 @@
  */
 package behavior;
 
+import com.barracuda.contest2014.ContestBot;
+
 /**
  *
  * @author Blu
@@ -74,7 +76,7 @@ public class Board {
 		Playability playability = new Playability(this, team);
 		double[][][] s = new double[10][10][10];
 		double total = 0;
-		for (int layer = 0; layer < 10; layer++) {
+		for (int layer = 0; layer < 7; layer++) {
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - layer - x; y++) {
 					Point at = new Point(x, y, layer);
@@ -106,6 +108,9 @@ public class Board {
 		double not = 0;
 		if (!playability.get(p)) {
 			return 0;
+		}
+		if (get(p) == team) {
+			return 1;
 		}
 		Tetra t = new TetraDown(p);
 		for (int x = p.x; x < 10; x++) {
@@ -164,7 +169,7 @@ public class Board {
 		return true;
 	}
 
-	public double security(Point p,int team,Playability teamPlayability,Playability otherPlayability) {
+	public double security(Point p, int team, Playability teamPlayability, Playability otherPlayability) {
 		// doublecounts points which are safe...
 		// are all safe points counted by 'security'?
 
@@ -200,34 +205,34 @@ public class Board {
 		// points where the opponent cannot play will be near '1' automatically
 		// this may be an issue because they can still be blocked
 
-		Playability teamPlayability = new Playability(this,team);
-		Playability otherPlayability = new Playability(this,opponentOf(team));
+		Playability teamPlayability = new Playability(this, team);
+		Playability otherPlayability = new Playability(this, opponentOf(team));
 		double sum = 0;
 		for (int layer = 0; layer < 10; layer++) {
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - x - layer; y++) {
-					Point at = new Point(x,y,layer);
-					sum += security(at,team,teamPlayability,otherPlayability);
+					Point at = new Point(x, y, layer);
+					sum += security(at, team, teamPlayability, otherPlayability);
 				}
 			}
 		}
 		return sum;
 	}
 
-	public double safeOrSecure(Point p,int team,Playability teamPlayability,Playability otherPlayability) {
+	public double safeOrSecure(Point p, int team, Playability teamPlayability, Playability otherPlayability) {
 		double safe = safeness(p, team, teamPlayability);
 		double secure = security(p, team, teamPlayability, otherPlayability);
 		return safe + secure - safe * secure;
 	}
 
 	public double safeOrSecure(int team) {
-		Playability teamPlayability = new Playability(this,team);
+		Playability teamPlayability = new Playability(this, team);
 		Playability otherPlayability = new Playability(this, opponentOf(team));
 		double sum = 0;
 		for (int layer = 0; layer < 10; layer++) {
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - layer - x; y++) {
-					sum += safeOrSecure(new Point(x,y,layer),team,teamPlayability,otherPlayability);
+					sum += safeOrSecure(new Point(x, y, layer), team, teamPlayability, otherPlayability);
 				}
 			}
 		}
@@ -235,7 +240,6 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-		//return safeness(team) - safeness(opponentOf(team)) * 1.5;
-		return safeOrSecure(team) - safeOrSecure(opponentOf(team));
+		return safeness(team) - safeness(opponentOf(team)) * 1.5;
 	}
 }

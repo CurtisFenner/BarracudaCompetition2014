@@ -28,7 +28,7 @@ public class Bot {
 		Playability playability = new Playability(board, team);
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 10 - x; y++) {
-				for (int layer = 0; layer < 10 - x - y; layer++) {
+				for (int layer = 0; layer < 10 - x - y && layer < 7; layer++) {
 					Point at = new Point(x, y, layer);
 					if (playability.get(at) && board.get(at) == 0) {
 						Board b = board.copy();
@@ -88,47 +88,17 @@ public class Bot {
 		if (moveCount <= 2) {
 			return new PlayerWaitMessage(input.id);
 		}
-
-		/* if (firstMove) {
-		 if (board.get(new Point(3, 3, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{3, 3, 0});
-		 }
-		 int num = (int) (Math.random() * 2);
-		 if (board.get(new Point(2 + num, 3 - num, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{2 + num, 3 - num, 0});
-		 }
-		 if (board.get(new Point(3 - num, 2 + num, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{3 - num, 2 + num, 0});
-		 }
-		 if (board.get(new Point(3 + num, 4 - num, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{3 + num, 4 - num, 0});
-		 }
-		 if (board.get(new Point(4 - num, 3 + num, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{4 - num, 3 + num, 0});
-		 }
-		 }
-
-		 if (board.get(new Point(1, 1, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{1, 1, 0});
-		 }
-		 if (board.get(new Point(7, 1, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{7, 1, 0});
-		 }
-		 if (board.get(new Point(1, 7, 0)) == 0) {
-		 return new PlayerMoveMessage(input.id, new int[]{1, 7, 0});
-		 } */
-
-		Board boardWait = board.copy();
-		Playability[] waitPlayabilities = new Playability[10];
+		//Board boardWait = board.copy();
+		//Playability[] waitPlayabilities = new Playability[10];
 
 		Playability playability = new Playability(board, team);
-		for (int layer = 0; layer < 10; layer++) {
+		for (int layer = 0; layer < 4; layer++) {
 			int passCount = layer - tokens + 1;
 			if (passCount >= 1) {
-				boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);
-				opponentTokens = tokens_flag;
-				Playability newWaitPlayability = new Playability(boardWait, team);
-				waitPlayabilities[passCount - 1] = newWaitPlayability;
+				//boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);
+				//opponentTokens = tokens_flag;
+				//Playability newWaitPlayability = new Playability(boardWait, team);
+				//waitPlayabilities[passCount - 1] = newWaitPlayability;
 			}
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - x - layer; y++) {
@@ -136,22 +106,15 @@ public class Bot {
 					if (playability.get(at) && board.get(at) == 0) {
 						Board b = board.copy();
 						b.playAt(at, team);
-						Board nextBoard = b.copy();//simulatePlay(b, opponentTeam, opponentTokens);
-						double score = nextBoard.boardScore(team);//b.boardScore(team);
+						Board nextBoard = b.copy();
+						double score = nextBoard.boardScore(team);
 						double difference = score - baseScore;
 
 						double efficiency = 1.0 / (2.0 + layer);
 
-						difference *= efficiency;
+						difference *= Math.pow(efficiency, 1.5);
 
-						double reduction = 1.0;
-						for (int i = 0; i < passCount; i++) {
-							if (!waitPlayabilities[i].get(at)) {
-								reduction *= FAILURE_REDUCTION;
-							}
-						}
-
-						difference *= reduction;
+						difference *= Math.pow(FAILURE_REDUCTION, Math.max(0, passCount));
 
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
