@@ -235,6 +235,7 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-		return safeness(team) - safeness(opponentOf(team)) * 1.5;
+		//return safeness(team) - safeness(opponentOf(team)) * 1.5;
+		return safeOrSecure(team) - safeOrSecure(opponentOf(team));
 	}
 }
