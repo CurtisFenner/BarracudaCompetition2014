@@ -34,8 +34,8 @@ public class Bot {
 						Board b = board.copy();
 						b.playAt(at, team);
 						double score = b.boardScore(team);
-						double efficiency = 1.0 / (1.0 + layer);
 						double difference = score - baseScore;
+						double efficiency = Math.min(1, tokens / (layer + 2.0));
 						difference *= efficiency;
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
@@ -73,6 +73,7 @@ public class Bot {
 	public static final double FAILURE_REDUCTION = 0.85;
 
 	public static PlayerMessage play(MoveRequestMessage input, boolean firstMove) {
+		System.out.println(input.state.tokens + "\t" + input.state.opponent_tokens);
 		int team = input.state.player;
 		Board board = new Board(input.state.board);
 		int opponentTeam = board.opponentOf(team);
@@ -106,6 +107,12 @@ public class Bot {
 		if (board.get(new Point(1, 1, 0)) == 0) {
 			return new PlayerMoveMessage(input.id, new int[]{1, 1, 0});
 		}
+		if (board.get(new Point(7, 1, 0)) == 0) {
+			return new PlayerMoveMessage(input.id, new int[]{7, 1, 0});
+		}
+		if (board.get(new Point(1, 7, 0)) == 0) {
+			return new PlayerMoveMessage(input.id, new int[]{1, 7, 0});
+		}
 
 		Board boardWait = board.copy();
 		Playability[] waitPlayabilities = new Playability[10];
@@ -128,7 +135,8 @@ public class Bot {
 						double score = b.boardScore(team);
 						double difference = score - baseScore;
 
-						double efficiency = 1.0 / (1.0 + layer);
+						double efficiency = 1.0 / (2.0 + layer);
+
 						difference *= efficiency;
 
 						double reduction = 1.0;
@@ -153,6 +161,12 @@ public class Bot {
 			System.out.println("BEST MOVE IS NULL");
 			return new PlayerWaitMessage(input.id);
 		}
+		if (board.safe(bestMove, team)) {
+			for (int i = 0; i < 10; i++) {
+				System.out.println("SAFE POINT PICKED @ " + bestMove);
+			}
+		}
+
 		if (bestMove.layer < tokens) {
 			return new PlayerMoveMessage(input.id, bestMove.toArray());
 		} else {

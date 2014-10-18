@@ -81,16 +81,16 @@ public class Board {
 		Tetra t = new TetraDown(p);
 		for (int x = p.x; x < 10; x++) {
 			for (int y = p.y; y < 10 - x; y++) {
-				for (int layer = 0; layer < 10 - x - y && layer <= p.layer; layer++) {
-					Point at = new Point(x, y, layer);
-					if (t.contains(at)) {
-						if (get(at) == team) {
-							mine++;
-						} else {
-							not++;
-						}
+				int layer = 0;
+				Point at = new Point(x, y, layer);
+				if (t.contains(at)) {
+					if (get(at) == team) {
+						mine++;
+					} else {
+						not++;
 					}
 				}
+
 			}
 		}
 		if (not == 0) {

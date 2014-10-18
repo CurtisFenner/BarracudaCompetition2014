@@ -28,4 +28,8 @@ public class Point {
 	public int[] toArray() {
 		return new int[] {x,y,layer};
 	}
+	
+	public String toString() {
+		return x + ", " + y + ", " + layer;
+	}
 }

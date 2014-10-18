@@ -92,10 +92,10 @@ public class ContestBot {
 				losses[FLIP]++;
 				System.out.println("LOST!");
 			}
-			
+
 			PrintBoard.print(g.state.board, myPlayerId);
-			
-			
+
+
 			//
 			for (FLIP = 0; FLIP < 2; FLIP++) {
 				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
@@ -103,7 +103,7 @@ public class ContestBot {
 				System.out.println("\t\t" + game_end_time / 1000 / 1000 + "ms");
 			}
 			//
-			FLIP = (int)(Math.random()*2);
+			FLIP = (int) (Math.random() * 2);
 			return null;
 		} else if (message.type.equals("greetings_program")) {
 			System.out.println("connected to server");
