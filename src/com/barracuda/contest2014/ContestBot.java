@@ -5,6 +5,7 @@
 package com.barracuda.contest2014;
 
 import behavior.Bot;
+import behavior.PrintBoard;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -66,12 +67,14 @@ public class ContestBot {
 		if (message.type.equals("request")) {
 			MoveRequestMessage m = (MoveRequestMessage) message;
 			game_end_time = m.state.time_remaining_ns;
+			boolean firstMove = false;
 			if (game_id != m.game_id) {
 				myPlayerId = m.state.player;
 				game_id = m.game_id;
 				System.out.println("New game: " + game_id);
+				firstMove = true;
 			}
-			return Bot.play(m);
+			return Bot.play(m, firstMove);
 		} else if (message.type.equals("move_result")) {
 			ResultMessage r = (ResultMessage) message;
 			if (r.state.error != null && r.state.error.length() > 0) {
@@ -84,9 +87,15 @@ public class ContestBot {
 			boolean won = g.state.winner == myPlayerId;
 			if (won) {
 				wins[FLIP]++;
+				System.out.println("WON!");
 			} else {
 				losses[FLIP]++;
+				System.out.println("LOST!");
 			}
+			
+			PrintBoard.print(g.state.board, myPlayerId);
+			
+			
 			//
 			for (FLIP = 0; FLIP < 2; FLIP++) {
 				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"

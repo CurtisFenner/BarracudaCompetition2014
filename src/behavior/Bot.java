@@ -72,7 +72,7 @@ public class Bot {
 	}
 	public static final double FAILURE_REDUCTION = 0.85;
 
-	public static PlayerMessage play(MoveRequestMessage input) {
+	public static PlayerMessage play(MoveRequestMessage input, boolean firstMove) {
 		int team = input.state.player;
 		Board board = new Board(input.state.board);
 		int opponentTeam = board.opponentOf(team);
@@ -83,6 +83,29 @@ public class Bot {
 		double baseScore = board.boardScore(team);
 		double bestDifference = 0;
 		//
+
+		if (firstMove) {
+			if (board.get(new Point(3, 3, 0)) == 0) {
+				return new PlayerMoveMessage(input.id, new int[]{3, 3, 0});
+			}
+			int num = (int) (Math.random() * 2);
+			if (board.get(new Point(2 + num, 3 - num, 0)) == 0) {
+				return new PlayerMoveMessage(input.id, new int[]{2 + num, 3 - num, 0});
+			}
+			if (board.get(new Point(3 - num, 2 + num, 0)) == 0) {
+				return new PlayerMoveMessage(input.id, new int[]{3 - num, 2 + num, 0});
+			}
+			if (board.get(new Point(3 + num, 4 - num, 0)) == 0) {
+				return new PlayerMoveMessage(input.id, new int[]{3 + num, 4 - num, 0});
+			}
+			if (board.get(new Point(4 - num, 3 + num, 0)) == 0) {
+				return new PlayerMoveMessage(input.id, new int[]{4 - num, 3 + num, 0});
+			}
+		}
+
+		if (board.get(new Point(1, 1, 0)) == 0) {
+			return new PlayerMoveMessage(input.id, new int[]{1, 1, 0});
+		}
 
 		Board boardWait = board.copy();
 		Playability[] waitPlayabilities = new Playability[10];
@@ -114,9 +137,9 @@ public class Bot {
 								reduction *= FAILURE_REDUCTION;
 							}
 						}
-						
-						difference *= FAILURE_REDUCTION;
-						
+
+						difference *= reduction;
+
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
 							bestMove = at;

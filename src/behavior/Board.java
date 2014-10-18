@@ -136,6 +136,6 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-		return safeness(team) - safeness(opponentOf(team));
+		return safeness(team) - safeness(opponentOf(team)) * 1.5;
 	}
 }
