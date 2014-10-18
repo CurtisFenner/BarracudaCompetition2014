@@ -71,10 +71,13 @@ public class Board {
 		if (not == 0) {
 			return 1;
 		}
-		double power = 12;
-		double size = mine + not;
-		double peak = (size - 1) / size;
-		return Math.pow(mine / (mine + not), power) / (1 - Math.pow(peak, power));
+		double power = 3;
+		return Math.pow(mine * 1.0 / (mine + not), power);
+		/*
+		 double size = mine + not;
+		 double peak = (size - 1) / size;
+		 return Math.pow(mine / (mine + not), power) / (1 - Math.pow(peak, power));
+		 */
 	}
 
 	public double safeness(int team) {
@@ -111,63 +114,7 @@ public class Board {
 		return boardValue(team);
 	}
 
-	private double boardScoreSub(int team) {
-		int score = 0;
-		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 10 - x; y++) {
-				for (int layer = 0; layer < 10 - y - x; layer++) {
-					Point k = new Point(x, y, layer);
-					boolean theyCantWeCan = !canPlay(k, opponentOf(team));
-					theyCantWeCan = theyCantWeCan && canPlay(k, team);
-					if (safe(k, team) || get(k) == team || theyCantWeCan) {
-						score++;
-					}
-				}
-			}
-		}
-		return score;
-	}
-
 	private double boardValue(int team) {
 		return safeness(team) - safeness(opponentOf(team));
-		/*
-		 int opponent = opponentOf(team);
-		 final double A = 0.5;
-		 final double S = 1.5;
-		 double score = 0;
-		 for (int x = 0; x < 10; x++) {
-		 for (int y = 0; y < 10 - x; y++) {
-		 for (int layer = 0; layer < 10 - x - y; layer++) {
-		 Point at = new Point(x, y, layer);
-		 if (get(at) == team) {
-		 score++;
-		 continue;
-		 }
-		 if (get(at) == opponent) {
-		 score--;
-		 continue;
-		 }
-		 if (safe(at, team)) {
-		 continue;
-		 }
-		 if (safe(at, opponent)) {
-		 continue;
-		 }
-		 if (canPlay(at, team) && canPlay(at, opponent)) {
-		 continue;
-		 }
-		 if (canPlay(at, team)) {
-		 score += A;
-		 continue;
-		 }
-		 if (canPlay(at, opponent)) {
-		 score -= A;
-		 continue;
-		 }
-		 }
-		 }
-		 }
-		 return score + (safeness(team) - safeness(opponent)) * S;
-		 */
 	}
 }

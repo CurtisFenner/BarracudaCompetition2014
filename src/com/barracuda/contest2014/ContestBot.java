@@ -6,6 +6,7 @@ package com.barracuda.contest2014;
 
 import behavior.Bot;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ContestBot {
 
@@ -72,11 +73,34 @@ public class ContestBot {
 			}
 			return Bot.play(m);
 		} else if (message.type.equals("move_result")) {
-			//ResultMessage r = (ResultMessage)message;
-			//System.out.println(r);
+			ResultMessage r = (ResultMessage) message;
+			if (r.state.error != null && r.state.error.length() > 0) {
+				System.out.println("MOVE RESULT ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				System.out.println(r);
+			}
 			return null;
 		} else if (message.type.equals("game_over")) {
 			GameOverMessage g = (GameOverMessage) message;
+			for (int layer = 0; layer < 10; layer++) {
+				String out = "\n";
+				for (int x = 0; x < 10 - layer; x++) {
+					for (int y = 0; y < 10 - x - layer; y++) {
+						String c = "O";
+						int b = g.state.board[x][y][layer];
+						if (b == myPlayerId) {
+							c = "#";
+						}
+						if (b == 0) {
+							c = ".";
+						}
+						out += c;
+					}
+					out += "\n";
+				}
+				System.out.println(out + "\n");
+			}
+
+
 			boolean won = g.state.winner == myPlayerId;
 			if (won) {
 				wins[FLIP]++;
@@ -88,7 +112,6 @@ public class ContestBot {
 				System.out.println(FLIP + "\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
 						+ "\t" + wins[FLIP] + " w \t" + losses[FLIP] + " l");
 				System.out.println(game_end_time / 1000 / 1000 + "ms remaining at end of game");
-				System.out.println(Bot.playing + "p " + Bot.waiting + "w");
 			}
 			//
 			FLIP = (int) (Math.random() * 2);
