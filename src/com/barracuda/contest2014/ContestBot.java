@@ -88,13 +88,13 @@ public class ContestBot {
 				losses[FLIP]++;
 			}
 			//
-			for (FLIP = 0; FLIP < 1; FLIP++) {
+			for (FLIP = 0; FLIP < 2; FLIP++) {
 				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
 						+ "\t" + wins[FLIP] + "W \t" + losses[FLIP] + "L");
 				System.out.println("\t\t" + game_end_time / 1000 / 1000 + "ms");
 			}
 			//
-			FLIP = 0;
+			FLIP = (int)(Math.random()*2);
 			return null;
 		} else if (message.type.equals("greetings_program")) {
 			System.out.println("connected to server");

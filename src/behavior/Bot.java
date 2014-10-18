@@ -9,6 +9,8 @@ import com.barracuda.contest2014.PlayerMessage;
 import com.barracuda.contest2014.PlayerMoveMessage;
 import com.barracuda.contest2014.PlayerWaitMessage;
 
+import com.barracuda.contest2014.ContestBot;
+
 /**
  *
  * @author Blu
@@ -87,11 +89,12 @@ public class Bot {
 
 		Playability playability = new Playability(board, team);
 		for (int layer = 0; layer < 10; layer++) {
-			if (layer >= tokens) {
+			int passCount = layer - tokens + 1;
+			if (passCount >= 1) {
 				boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);
 				opponentTokens = tokens_flag;
-				Playability newWaitPlayability = new Playability(boardWait,team);
-				waitPlayabilities[layer - tokens] = newWaitPlayability;
+				Playability newWaitPlayability = new Playability(boardWait, team);
+				waitPlayabilities[passCount - 1] = newWaitPlayability;
 			}
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - x - layer; y++) {
@@ -101,17 +104,23 @@ public class Bot {
 						b.playAt(at, team);
 						double score = b.boardScore(team);
 						double difference = score - baseScore;
-						
+
 						double efficiency = 1.0 / (1.0 + layer);
 						difference *= efficiency;
 
 						double reduction = 1.0;
-						for (int i = 0; i <= layer - tokens; i++) {
+						for (int i = 0; i < passCount; i++) {
 							if (!waitPlayabilities[i].get(at)) {
 								reduction *= FAILURE_REDUCTION;
 							}
 						}
-						difference *= reduction;
+						
+						if (ContestBot.FLIP == 0) {
+							difference *= 0.35;
+						} else {
+							difference *= 0.85;
+						}
+						
 
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
