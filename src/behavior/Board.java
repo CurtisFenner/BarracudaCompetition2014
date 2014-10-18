@@ -164,6 +164,76 @@ public class Board {
 		return true;
 	}
 
+	public double security(Point p,int team,Playability teamPlayability,Playability otherPlayability) {
+		// doublecounts points which are safe...
+		// are all safe points counted by 'security'?
+
+		double self = 0;
+		double other = 0;
+		for (int layer = p.layer; layer < 10; layer++) {
+			for (int ax = 0; ax <= layer - p.layer; ax++) {
+				for (int ay = 0; ay <= layer - p.layer - ax; ay++) {
+					Point at = new Point(p.x + ax, p.y + ay, layer);
+					// at is inside the tetrahedron above 'p'
+					// now check if it is inside the board
+					if (Tetra.boardTetra.contains(at)) {
+						if (teamPlayability.get(at)) {
+							self++;
+						}
+						if (otherPlayability.get(at)) {
+							other++;
+						}
+					}
+				}
+			}
+		}
+		if (self == 0) {
+			return 0;
+		}
+		return self / (self + other);
+	}
+
+	public double security(int team) {
+		// security counts all fully safe points as '1'
+		// we can mix the two if desired
+		// 'safe' or 'secure'
+		// points where the opponent cannot play will be near '1' automatically
+		// this may be an issue because they can still be blocked
+
+		Playability teamPlayability = new Playability(this,team);
+		Playability otherPlayability = new Playability(this,opponentOf(team));
+		double sum = 0;
+		for (int layer = 0; layer < 10; layer++) {
+			for (int x = 0; x < 10 - layer; x++) {
+				for (int y = 0; y < 10 - x - layer; y++) {
+					Point at = new Point(x,y,layer);
+					sum += security(at,team,teamPlayability,otherPlayability);
+				}
+			}
+		}
+		return sum;
+	}
+
+	public double safeOrSecure(Point p,int team,Playability teamPlayability,Playability otherPlayability) {
+		double safe = safeness(p, team, teamPlayability);
+		double secure = security(p, team, teamPlayability, otherPlayability);
+		return safe + secure - safe * secure;
+	}
+
+	public double safeOrSecure(int team) {
+		Playability teamPlayability = new Playability(this,team);
+		Playability otherPlayability = new Playability(this, opponentOf(team));
+		double sum = 0;
+		for (int layer = 0; layer < 10; layer++) {
+			for (int x = 0; x < 10 - layer; x++) {
+				for (int y = 0; y < 10 - layer - x; y++) {
+					sum += safeOrSecure(new Point(x,y,layer),team,teamPlayability,otherPlayability);
+				}
+			}
+		}
+		return sum;
+	}
+
 	public double boardScore(int team) {
 		return safeness(team) - safeness(opponentOf(team)) * 1.5;
 	}
