@@ -120,7 +120,7 @@ public class Bot {
 		//Board boardWait = board.copy();
 		//Playability[] waitPlayabilities = new Playability[10];
 		//
-		Point bestMove = null;
+
 		double baseScore = board.boardScore(team);
 		double bestDifference = 0;
 		//
@@ -138,6 +138,10 @@ public class Bot {
 		}
 
 		//
+
+		double[] bestMoveValues = new double[5];
+		Point[] bestMovePoints = new Point[bestMoveValues.length];
+
 		Playability playability = new Playability(board, team);
 		for (int layer = 0; layer < layerLimit; layer++) {
 			int passCount = layer - tokens + 1;
@@ -162,15 +166,53 @@ public class Bot {
 
 						difference *= Math.pow(FAILURE_REDUCTION, Math.max(0, passCount));
 
-						if (bestMove == null || difference > bestDifference) {
-							bestDifference = difference;
-							bestMove = at;
+						int foundIndex = -1;
+						for (int i = 0; i < bestMoveValues.length; i++) {
+							if (bestMovePoints[i] == null) {
+								foundIndex = i;
+								break;
+							}
+							if (foundIndex < 0 || bestMoveValues[i] < bestMoveValues[foundIndex]) {
+								foundIndex = i;
+							}
 						}
+						if (foundIndex >= 0 && (bestMovePoints[foundIndex] == null || bestMoveValues[foundIndex] < difference)) {
+							bestMoveValues[foundIndex] = difference;
+							bestMovePoints[foundIndex] = at;
+						}
+
+
 					}
 
 				}
 			}
 		}
+
+		// compute next board state values
+
+		int bestMoveIndex = -1;
+		double bestMoveValue = -1.0/0.0;
+		for (int i = 0; i < bestMoveValues.length; i++) {
+			if (bestMovePoints[i] == null) {
+				continue;
+			}
+			Board b = simulatePlay(board, opponentTeam,opponentTokens);
+			double value = b.boardScore(team);
+			if (value > bestMoveValue) {
+				bestMoveValue = value;
+				bestMoveIndex = i;
+			}
+
+		}
+
+		Point bestMove;
+		if (bestMoveIndex < 0) {
+			bestMove = null;
+		} else {
+			bestMove = bestMovePoints[bestMoveIndex];
+		}
+
+
 		if (bestMove == null) {
 			System.out.println("BEST MOVE IS NULL");
 			return new PlayerWaitMessage(input.id);
