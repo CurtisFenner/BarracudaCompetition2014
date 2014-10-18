@@ -92,12 +92,12 @@ public class ContestBot {
 			boolean won = g.state.winner == myPlayerId;
 			if (won) {
 				wins[FLIP]++;
-				System.out.println("WON!");
+				System.out.print("WON!");
 			} else {
 				losses[FLIP]++;
-				System.out.println("LOST!");
+				System.out.print("LOST!");
 			}
-			System.out.println("FLIP: " + FLIP);
+			System.out.println("\tFLIP: " + FLIP + FLIP + FLIP);
 
 			// PrintBoard.print(g.state.board, myPlayerId);
 

@@ -181,51 +181,13 @@ public class Board {
 					} else {
 						s[x][y][layer] = 0;
 					}
-					total += Math.pow(s[x][y][layer] / ((layer + 1) * (layer + 2) / 2.0), 3);
-				}
-			}
-		}
-		return total;
-	}
-
-	public double safeness(Point p, int team, Playability playability) {
-		double mine = 0;
-		double not = 0;
-		if (!playability.get(p)) {
-			return 0;
-		}
-		if (get(p) == team) {
-			return 1;
-		}
-		Tetra t = new TetraDown(p);
-		for (int x = p.x; x < 10; x++) {
-			for (int y = p.y; y < 10 - x; y++) {
-				int layer = 0;
-				Point at = new Point(x, y, layer);
-				if (t.contains(at)) {
-					if (get(at) == team) {
-						mine++;
-					} else {
-						not++;
+					double factor = 1;
+					if (layer == 0) {
+						if (x == 0 || y == 0 || x + y == 9) {
+							factor = 0.5;
+						}
 					}
-				}
-
-			}
-		}
-		if (not == 0) {
-			return 1;
-		}
-		double power = 3;
-		return Math.pow(mine * 1.0 / (mine + not), power);
-	}
-
-	public double safenessSlower(int team) {
-		Playability playability = new Playability(this, team);
-		double total = 0;
-		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 10 - x; y++) {
-				for (int layer = 0; layer < 10 - x - y; layer++) {
-					total += safeness(new Point(x, y, layer), team, playability);
+					total += Math.pow(s[x][y][layer] * factor / ((layer + 1) * (layer + 2) / 2.0), 3);
 				}
 			}
 		}
@@ -250,7 +212,7 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-			return safeness(team) - safeness(opponentOf(team)) * 3;
-			// A few percent better than "* 1.5"
+		return safeness(team) - safeness(opponentOf(team)) * 3;
+		// A few percent better than "* 1.5"
 	}
 }
