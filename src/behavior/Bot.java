@@ -68,11 +68,12 @@ public class Bot {
 		tokens_flag = tokens;
 		return board;
 	}
-	public static final double FAILURE_REDUCTION = 0.15;
+	public static final double FAILURE_REDUCTION = 0.6;
 
 	public static PlayerMessage play(MoveRequestMessage input) {
 		int team = input.state.player;
 		Board board = new Board(input.state.board);
+		int opponentTeam = board.opponentOf(team);
 		int tokens = input.state.tokens;
 		int opponentTokens = input.state.opponent_tokens;
 		//
@@ -87,9 +88,11 @@ public class Bot {
 		Playability playability = new Playability(board, team);
 		for (int layer = 0; layer < 10; layer++) {
 			if (layer >= tokens) {
-				boardWait = simulatePlay(boardWait, team, tokens);
+				boardWait = simulatePlay(boardWait, opponentTeam, opponentTokens);
+				opponentTokens = tokens_flag;
+				Playability newWaitPlayability = new Playability(boardWait,team);
+				waitPlayabilities[layer - tokens] = newWaitPlayability;
 			}
-			Playability waitPlayability = new Playability(boardWait, team);
 			for (int x = 0; x < 10 - layer; x++) {
 				for (int y = 0; y < 10 - x - layer; y++) {
 					Point at = new Point(x, y, layer);
@@ -97,13 +100,18 @@ public class Bot {
 						Board b = board.copy();
 						b.playAt(at, team);
 						double score = b.boardScore(team);
-						double efficiency = 1.0 / (1.0 + layer);
 						double difference = score - baseScore;
+						
+						double efficiency = 1.0 / (1.0 + layer);
 						difference *= efficiency;
 
-						if (!waitPlayability.get(at)) {
-							difference *= FAILURE_REDUCTION;
+						double reduction = 1.0;
+						for (int i = 0; i <= layer - tokens; i++) {
+							if (!waitPlayabilities[i].get(at)) {
+								reduction *= FAILURE_REDUCTION;
+							}
 						}
+						difference *= reduction;
 
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
@@ -113,6 +121,10 @@ public class Bot {
 
 				}
 			}
+		}
+		if (bestMove == null) {
+			System.out.println("BEST MOVE IS NULL");
+			return new PlayerWaitMessage(input.id);
 		}
 		if (bestMove.layer < tokens) {
 			return new PlayerMoveMessage(input.id, bestMove.toArray());
