@@ -35,7 +35,7 @@ public class Bot {
 						b.playAt(at, team);
 						double score = b.boardScore(team);
 						double difference = score - baseScore;
-						double efficiency = Math.min(1, tokens / (layer + 2.0));
+						double efficiency = 1.0; //Math.min(1, tokens / (layer + 2.0));
 						difference *= efficiency;
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
@@ -74,12 +74,6 @@ public class Bot {
 	public static final double FAILURE_REDUCTION = 0.85;
 
 	public static PlayerMessage play(MoveRequestMessage input, int moveCount) {
-		if (ContestBot.myPlayerId == 1) {
-			System.out.println("Scores: " + input.state.score.player1 + "\t" + input.state.score.player2);
-		} else {
-			System.out.println("Scores: " + input.state.score.player2 + "\t" + input.state.score.player1);
-		}
-		System.out.println(input.state.tokens + "\t" + input.state.opponent_tokens);
 		int team = input.state.player;
 		Board board = new Board(input.state.board);
 		int opponentTeam = board.opponentOf(team);
@@ -97,6 +91,10 @@ public class Bot {
 		}
 		if (opponentScore <= 2) {
 			ContestBot.thisWait++;
+		}
+
+		if (board.get(new Point(3, 3, 0)) == 0) {
+			return new PlayerMoveMessage(input.id, new int[]{3, 3, 0});
 		}
 
 		if (tokens == 1 && Math.random() < 0.5) {
@@ -160,7 +158,7 @@ public class Bot {
 						double score = b.boardScore(team);
 						double difference = score - baseScore;
 
-						double efficiency = 1.0 / (2.0 + layer);
+						double efficiency = 1.0; // 1.0 / (2.0 + layer);
 
 						difference *= Math.pow(efficiency, 1.5);
 
@@ -191,12 +189,12 @@ public class Bot {
 		// compute next board state values
 
 		int bestMoveIndex = -1;
-		double bestMoveValue = -1.0/0.0;
+		double bestMoveValue = -1.0 / 0.0;
 		for (int i = 0; i < bestMoveValues.length; i++) {
 			if (bestMovePoints[i] == null) {
 				continue;
 			}
-			Board b = simulatePlay(board, opponentTeam,opponentTokens);
+			Board b = simulatePlay(board, opponentTeam, opponentTokens);
 			double value = b.boardScore(team);
 			if (value > bestMoveValue) {
 				bestMoveValue = value;
