@@ -22,6 +22,31 @@ public class Board {
 		return board[p.x][p.y][p.layer];
 	}
 
+	public Board copy() {
+		int[][][] c = new int[10][10][10];
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10 - x; y++) {
+				for (int layer = 0; layer < 10 - x - y; layer++) {
+					c[x][y][layer] = board[x][y][layer];
+				}
+			}
+		}
+		return new Board(c);
+	}
+
+	public void playAt(Point p, int team) {
+		int x = p.x;
+		int y = p.y;
+		int layer = p.layer;
+		for (int a = 0; a <= layer; a++) {
+			for (int b = 0; b <= layer - a; b++) {
+				for (int c = 0; c <= layer - a - b; c++) {
+					set(new Point(x + a, y + b, c), team);
+				}
+			}
+		}
+	}
+
 	public void set(Point p, int team) {
 		board[p.x][p.y][p.layer] = team;
 	}
@@ -111,10 +136,6 @@ public class Board {
 	}
 
 	public double boardScore(int team) {
-		return boardValue(team);
-	}
-
-	private double boardValue(int team) {
 		return safeness(team) - safeness(opponentOf(team));
 	}
 }

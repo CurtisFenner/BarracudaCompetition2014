@@ -81,26 +81,6 @@ public class ContestBot {
 			return null;
 		} else if (message.type.equals("game_over")) {
 			GameOverMessage g = (GameOverMessage) message;
-			for (int layer = 0; layer < 10; layer++) {
-				String out = "\n";
-				for (int x = 0; x < 10 - layer; x++) {
-					for (int y = 0; y < 10 - x - layer; y++) {
-						String c = "O";
-						int b = g.state.board[x][y][layer];
-						if (b == myPlayerId) {
-							c = "#";
-						}
-						if (b == 0) {
-							c = ".";
-						}
-						out += c;
-					}
-					out += "\n";
-				}
-				System.out.println(out + "\n");
-			}
-
-
 			boolean won = g.state.winner == myPlayerId;
 			if (won) {
 				wins[FLIP]++;
@@ -108,13 +88,13 @@ public class ContestBot {
 				losses[FLIP]++;
 			}
 			//
-			for (FLIP = 0; FLIP < wins.length; FLIP++) {
-				System.out.println(FLIP + "\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
-						+ "\t" + wins[FLIP] + " w \t" + losses[FLIP] + " l");
-				System.out.println(game_end_time / 1000 / 1000 + "ms remaining at end of game");
+			for (FLIP = 0; FLIP < 1; FLIP++) {
+				System.out.print("F[" + FLIP + "]\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
+						+ "\t" + wins[FLIP] + "W \t" + losses[FLIP] + "L");
+				System.out.println("\t\t" + game_end_time / 1000 / 1000 + "ms");
 			}
 			//
-			FLIP = (int) (Math.random() * 2);
+			FLIP = 0;
 			return null;
 		} else if (message.type.equals("greetings_program")) {
 			System.out.println("connected to server");
