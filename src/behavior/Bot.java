@@ -70,7 +70,7 @@ public class Bot {
 		tokens_flag = tokens;
 		return board;
 	}
-	public static final double FAILURE_REDUCTION = 0.6;
+	public static final double FAILURE_REDUCTION = 0.85;
 
 	public static PlayerMessage play(MoveRequestMessage input) {
 		int team = input.state.player;
@@ -115,13 +115,8 @@ public class Bot {
 							}
 						}
 						
-						if (ContestBot.FLIP == 0) {
-							difference *= 0.35;
-						} else {
-							difference *= 0.85;
-						}
+						difference *= FAILURE_REDUCTION;
 						
-
 						if (bestMove == null || difference > bestDifference) {
 							bestDifference = difference;
 							bestMove = at;
