@@ -128,7 +128,7 @@ public class Bot {
 		int layerLimit = 6;
 
 
-		if (ContestBot.FLIP == 1 && myScore <= 2 && opponentScore <= 2) {
+		if (myScore <= 2 && opponentScore <= 2) {
 			System.out.println(moveCount + " >? " + ContestBot.lastWait + " / " + tokens);
 			if (moveCount > ContestBot.lastWait || moveCount > 5) {
 				layerLimit = tokens;
