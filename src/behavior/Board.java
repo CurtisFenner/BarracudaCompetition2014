@@ -4,8 +4,6 @@
  */
 package behavior;
 
-import com.barracuda.contest2014.ContestBot;
-
 /**
  *
  * @author Blu
@@ -72,6 +70,37 @@ public class Board {
 		return true;
 	}
 
+	public double safeness(int team) {
+		Playability playability = new Playability(this, team);
+		double[][][] s = new double[10][10][10];
+		double total = 0;
+		for (int layer = 0; layer < 10; layer++) {
+			for (int x = 0; x < 10 - layer; x++) {
+				for (int y = 0; y < 10 - layer - x; y++) {
+					Point at = new Point(x, y, layer);
+					if (playability.get(at)) {
+						if (layer == 0) {
+							s[x][y][layer] = get(at) == team ? 1 : 0;
+						} else if (layer == 1) {
+							s[x][y][layer] = s[x][y][layer - 1] + s[x + 1][y][layer - 1] + s[x][y + 1][layer - 1];
+						} else if (layer == 2) {
+							s[x][y][layer] = s[x][y][layer - 1] + s[x + 1][y][layer - 1] + s[x][y + 1][layer - 1];
+							s[x][y][layer] -= s[x + 1][y][layer - 2] + s[x][y + 1][layer - 2] + s[x + 1][y + 1][layer - 2];
+						} else {
+							s[x][y][layer] = s[x][y][layer - 1] + s[x + 1][y][layer - 1] + s[x][y + 1][layer - 1];
+							s[x][y][layer] -= s[x + 1][y][layer - 2] + s[x][y + 1][layer - 2] + s[x + 1][y + 1][layer - 2];
+							s[x][y][layer] += s[x + 1][y + 1][layer - 3];
+						}
+					} else {
+						s[x][y][layer] = 0;
+					}
+					total += Math.pow(s[x][y][layer] / ((layer + 1) * (layer + 2) / 2.0), 3);
+				}
+			}
+		}
+		return total;
+	}
+
 	public double safeness(Point p, int team, Playability playability) {
 		double mine = 0;
 		double not = 0;
@@ -105,7 +134,7 @@ public class Board {
 		 */
 	}
 
-	public double safeness(int team) {
+	public double safenessSlower(int team) {
 		Playability playability = new Playability(this, team);
 		double total = 0;
 		for (int x = 0; x < 10; x++) {

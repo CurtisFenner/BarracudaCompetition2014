@@ -20,6 +20,7 @@ public class ContestBot {
 	private int[] wins = new int[2];
 	private int[] losses = new int[2];
 	private long game_end_time = 0;
+	private int turn = 0;
 
 	public ContestBot(String host, int port) {
 		this.host = host;
@@ -67,14 +68,14 @@ public class ContestBot {
 		if (message.type.equals("request")) {
 			MoveRequestMessage m = (MoveRequestMessage) message;
 			game_end_time = m.state.time_remaining_ns;
-			boolean firstMove = false;
 			if (game_id != m.game_id) {
 				myPlayerId = m.state.player;
 				game_id = m.game_id;
 				System.out.println("New game: " + game_id);
-				firstMove = true;
+				turn = 0;
 			}
-			return Bot.play(m, firstMove);
+			turn++;
+			return Bot.play(m, turn);
 		} else if (message.type.equals("move_result")) {
 			ResultMessage r = (ResultMessage) message;
 			if (r.state.error != null && r.state.error.length() > 0) {
