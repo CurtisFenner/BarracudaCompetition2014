@@ -64,7 +64,6 @@ public class ContestBot {
 	public PlayerMessage handleMessage(Message message) {
 		if (message.type.equals("request")) {
 			MoveRequestMessage m = (MoveRequestMessage) message;
-			//System.out.println(m);
 			game_end_time = m.state.time_remaining_ns;
 			if (game_id != m.game_id) {
 				myPlayerId = m.state.player;
@@ -72,13 +71,6 @@ public class ContestBot {
 				System.out.println("New game: " + game_id);
 			}
 			return Bot.play(m);
-			/* if (Math.random() < 0.5) {
-			 return new PlayerWaitMessage(m.id);
-			 }
-			 else {
-			 int i = (int)(Math.random() * m.state.legal_moves.length);
-			 return new PlayerMoveMessage(m.id, m.state.legal_moves[i]);
-			 } */
 		} else if (message.type.equals("move_result")) {
 			//ResultMessage r = (ResultMessage)message;
 			//System.out.println(r);
@@ -95,7 +87,8 @@ public class ContestBot {
 			for (FLIP = 0; FLIP < wins.length; FLIP++) {
 				System.out.println(FLIP + "\t" + (int) ((100.0 * wins[FLIP]) / (wins[FLIP] + losses[FLIP]) + 0.5) + "%"
 						+ "\t" + wins[FLIP] + " w \t" + losses[FLIP] + " l");
-				System.out.println(game_end_time / 1000 + "ms remaining at end of game");
+				System.out.println(game_end_time / 1000 / 1000 + "ms remaining at end of game");
+				System.out.println(Bot.playing + "p " + Bot.waiting + "w");
 			}
 			//
 			FLIP = (int) (Math.random() * 2);
